@@ -56,4 +56,6 @@ The final project for EEC201. Winter 2024
                                                             @@@@@                                   
                                                             @@@@@@                                  
                                                                                                     
-                                                                                                    
+
+## Design Flowchart                                                                                                 
+![Alt text](https://github.com/Jan-Tru/EEC201-Final-Project/blob/main/1709584990091588877774225676625.jpg)
