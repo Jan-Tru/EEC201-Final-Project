@@ -18,7 +18,7 @@ dvect13 = Distance2MelCeps(MelCA1, MelCA3);
 dvect14 = Distance2MelCeps(MelCA1, MelCA4);
 
 % initialize distance vector
-inputArrayNum = 2;
+inputArrayNum = 15;
 distanceVector = zeros(numFiles,1);
 for k = 1:numFiles
     if ~isempty(zero_train{k})
@@ -29,7 +29,7 @@ for k = 1:numFiles
             ))
     else
         % Handle the case where the zero train file does not exist
-        distanceVector(k,1) = nan % Set distance to very long
+        distanceVector(k,1) = 999 % Set distance to very long
     end
 end
 
