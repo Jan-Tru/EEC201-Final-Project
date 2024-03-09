@@ -15,7 +15,8 @@ classdef WavFileObj
            Data
            SampleRate
            FrameArray
-           FFTLength = 256; % Define the FFT Length here for all objects
+           FrameMaxThreshold = 0.009 % Define default threshold for th emax amplitude of a Frame in FrameArray, Frames with a lesser max amplitude are killed
+           FFTLength = 256*2; % Define the FFT Length here for all objects
            FFTArray
            MelPointAmount = 20;
            MelWrapArray;
@@ -34,6 +35,12 @@ classdef WavFileObj
                 % create the frames
                 obj.FrameArray = FrameSplitter(obj.Data,obj.SampleRate);
                 
+                % Find frames greater than 0.009 max amplitude
+                idx = max(obj.FrameArray) > obj.FrameMaxThreshold;
+                
+                % Extract frames that meet the condition
+                obj.FrameArray = obj.FrameArray(:, idx);
+
                 % take the magnitude of the fft of each column and save to
                 % FFTArray
                 obj.FFTArray = abs(fft(obj.FrameArray,obj.FFTLength));

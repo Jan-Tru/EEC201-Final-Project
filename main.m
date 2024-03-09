@@ -4,9 +4,16 @@
 %% Testing section for all the Methods of WavFileObj
 clc;
 
-numFiles = 19;
-zero_train = LoadMassFiles("Zero_train",numFiles);
-zero_test = LoadMassFiles("Zero_test",numFiles);
+numTestFiles = 8;
+numTrainFiles = 8;
+
+test_objs = LoadMassFiles("test",numTestFiles);
+train_objs = LoadMassFiles("train",numTrainFiles);
+
+
+
+% zero_train = LoadMassFiles("Zero_train",numFiles);
+% zero_test = LoadMassFiles("Zero_test",numFiles);
 % twelve_train = LoadMassFiles("Zero_train",numFiles);
 % twelve_test = LoadMassFiles("Zero_test",numFiles);
 
@@ -19,12 +26,22 @@ zero_test = LoadMassFiles("Zero_test",numFiles);
 % dvect13 = Distance2MelCeps(MelCA1, MelCA3);
 % dvect14 = Distance2MelCeps(MelCA1, MelCA4);
 
-a = zero_train{1}.FrameArray
-% format short;
-% for test input audio objects, k
-% for k = 1:19
-%     [minDistance, minIndex] = TestTrainDistanceFinder(k,zero_test,zero_train);
-% end
+format short;
+% k = 1;
+% [minDistance, minIndex, distanceVector] = TestTrainDistanceFinder(k,zero_test,zero_train);
+% disp(distanceVector)
 
+%for test input audio objects, k
+numCorrect = 0;
+for k = 1:numTestFiles
+    [minDistance, minIndex, distanceVector] = TestTrainDistanceFinder(k,test_objs,train_objs);
+    if minIndex == k
+        numCorrect = numCorrect + 1;
+    end
+end
+disp(numCorrect)
+numAudioFiles = numTestFiles;
+percentCorrect = numCorrect/numAudioFiles;
+disp(percentCorrect*100);
 
 
