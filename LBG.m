@@ -1,143 +1,137 @@
+
+function [codebook] = LBG(input_matrix,k)
 % What did they call President LBJ after January 22, 1973?
 % Lyndon B. Gone-son 
 % LBG.m
-% The Gray Algothriym is pretty straight foward after watching some indian
+% The Luzo C Gray Algothriym is pretty straight foward after watching some indian
 % tutorials online
 
-% Documentation is good practice:
-% Check out my notes book here:
-% https://docs.google.com/document/d/152HAazzLdOS3QUUInrrWwNTqjM8M0xmH5qu6tLAJnzA/edit?usp=sharing
-% 
+% Goal: I want this to be a function.
+% it will take in a MelCATrain_X array
+% it will produce a codebook for this array
+% Input: MelCATrain_X
+% Remember that this function takes in a MelCA and makes a codebook for it
+% C is the cluster assignment
+
+%input_matrix = Input_Array;
+%k = 10;
 
 clc;
-numTestFiles = 8;
-numTrainFiles = 8;
-numFiles = 8;
-test_objs = LoadMassFiles("test",numTestFiles);
-train_objs = LoadMassFiles("train",numTrainFiles);
+num_runs = 100;
 
-% Loading in the files again because I want to just work on it
-% self-contained first
-format short;
-%for test input audio objects, k
-numCorrect = 0;
-for k = 1:numTestFiles
-    [minDistance, minIndex, distanceVector] = TestTrainDistanceFinder(k,test_objs,train_objs);
-    if minIndex == k
-        numCorrect = numCorrect + 1;
+% matrix init
+idx_all = cell(num_runs, 1);
+obj_values = zeros(num_runs, 1);
+
+opts = statset('Display', 'off');
+
+for i = 1:num_runs
+    [idx, C, sumd, D] = kmeans(input_matrix, k, 'Start', 'plus', 'Options', opts);
+    idx_all{i} = idx;
+    obj_values(i) = sum(sumd);
+end
+
+% Select the clustering result with the best overall performance
+[~, best_run] = min(obj_values);
+idx = idx_all{best_run};
+% fprintf('%d \n',idx )
+% fprintf('best_run = %d\n',best_run')
+
+C_copy = C;
+
+% I have my seedling centroid.... You know I had to double it
+size(C)
+err = 0.001;
+C1 = DoubleTheCentroids(C, err);
+size(C1)
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+num_iterations = 500; % Define the maximum number of iterations
+
+% Initialize the loop variables
+
+
+% Initialize the matrix with zeros
+C_old = zeros(size(C1));
+
+% Define the tolerance for convergence
+tolerance = 0.1;
+fprintf('Anudda one')
+% Initialize a structure to store centroid variables
+centroid_struct = struct();
+
+% Iterate until convergence or maximum number of iterations
+while true
+
+    % Create a copy of the current centroids
+    Cnew = C;
+    fprintf('\n Anudda one \n')
+    % Update centroids for each iteration
+    for i = 1:num_iterations
+        % Double the centroids and store them in the old centroid positions
+        C_new = DoubleTheCentroids(C1, err);
+         fprintf('\n Hi1 \n')   
+        % Store the updated centroids in the centroid structure
+       % centroid_struct.(['C' num2str(i)]) = C_new;
+         fprintf('\n Hi2 \n')   
     end
-end
-disp(numCorrect)
-numAudioFiles = numTestFiles;
-percentCorrect = numCorrect/numAudioFiles;
-fprintf('Congratulations, you have %d%% Accuracy\n', percentCorrect*100);
 
-% Columns: Num of Vectors
-% Length of Vector: 19, number of features
-% n = rows
-% m = columns
-% [n, m]
-% k is how many bundles of the columns you are going to make
+    % Update the centroids from the previous iteration
+    C_old = C_new;
 
+    norm(C_old - C_new)
+         fprintf('\n Hi3 \n')   
+    % Check for convergence
+    if norm(C_old - C_new) < tolerance
+        fprintf('\n JACKPOT!!! \n')
+       break; % Break the loop if convergence criterion is met
 
-
-MelCA1 = train_objs{1}.MelCepstrumArray;
-MelCA2 = train_objs{2}.MelCepstrumArray;
-MelCA3 = train_objs{3}.MelCepstrumArray;
-MelCA4 = train_objs{4}.MelCepstrumArray;
-
-[N, M] = size(MelCA1);
-numTrainFiles;
-err = 0.01;
+    end
 
 
-if mod(M, 2) ~= 0
-    % If not, decrease the number of columns by 1
-    MelCA1 = MelCA1(:, 1:end-1);
-    M = M - 1;
-end
-
-% You know I had to double it
-for k = 1:numTrainFiles
     
-    if minIndex == k
-        numCorrect = numCorrect + 1;
-    end
 end
-disp(numCorrect)
+ 
+codebook = C_new;
 
-% Define the error value
-err = 0.1;  % Example error value
 
-% Get the size of the original array
-[N, M] = size(MelCA1);
 
-% Create a copy of the original array with the error added
-dub_MelCA1 = MelCA1 + err;
 
-% Concatenate the original array and the copied array horizontally
-dub_MelCA1 = [MelCA1, dub_MelCA1];
 
-% Display the concatenated array
-disp(dub_MelCA1);
 
-% Handle NaN values by replacing them with zeros
-dub_MelCA1(isnan(dub_MelCA1)) = 0;
 
-% Perform hierarchical clustering
-tree = linkage(dub_MelCA1', 'ward', 'euclidean');
 
-% Visualize dendrogram to determine the number of clusters
-figure;
-dendrogram(tree);
-title('Dendrogram');
-xlabel('Data Points');
-ylabel('Distance');
 
-% Choose the number of clusters using the elbow method
-eval_results = evalclusters(dub_MelCA1', 'linkage', 'silhouette', 'KList', 1:10);
-best_k = eval_results.OptimalK;
 
-% Extract cluster centroids as initial codebook vectors
-k = best_k;
-clusters = cluster(tree, 'maxclust', k);
-initial_codebook = zeros(size(dub_MelCA1, 1), k);
-for i = 1:k
-    cluster_indices = find(clusters == i);
-    initial_codebook(:, i) = mean(dub_MelCA1(:, cluster_indices), 2);
+
 end
 
-% Perform k-means clustering using initial codebook vectors
-[idx, codebook] = kmeans(dub_MelCA1', k, 'Start', initial_codebook', 'MaxIter', 1000);
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% This block plots the clusters and centeroids
 
-% Evaluate the performance of the clustering using silhouette plots
-silhouette_values = silhouette(dub_MelCA1', idx);
-
-% Plot silhouette values
-figure;
-silhouette(dub_MelCA1', idx);
-title('Silhouette Plot');
-
-% Display the resulting codebook
-disp('Codebook:');
-disp(codebook);
-
-
-% Assuming 'test_data' contains the test data and 'codebook' contains the codebook vectors
-
-% Transpose test_data if needed to match the dimensions of codebook
-if size(MelCA2, 1) ~= size(codebook, 1)
-    MelCA2 = MelCA2';
-end
-
-% Calculate distances between test data and codebook vectors
-distances = pdist2(MelCA2', codebook', 'euclidean'); % Euclidean distance
-
-% Assign labels based on nearest codebook vector
-[~, assigned_labels] = min(distances, [], 2);
-
-% Display assigned labels for the test data
-disp('Assigned Labels for Test Data:');
-disp(assigned_labels);
-
-
+% % Example data matrix
+% X = input_matrix;
+% 
+% % Perform PCA to reduce dimensionality to 3 dimensions
+% coeff = pca(X);
+% X_pca = X * coeff(:, 1:3);
+% 
+% % Example centroid array
+% centroids = C_new;
+% 
+% % Plot the reduced-dimensional data and centroids in 3D
+% scatter3(X_pca(:, 1), X_pca(:, 2), X_pca(:, 3), 50, 'filled');
+% hold on;
+% scatter3(centroids(:, 1), centroids(:, 2), centroids(:, 3), 200, 'r', 'x');
+% hold off;
+%          fprintf('\n I need to ploop \n')  
+% xlabel('Principal Component 1');
+% ylabel('Principal Component 2');
+% zlabel('Principal Component 3');
+% title('PCA Visualization of High-Dimensional Data with Centroids (3D)');
+% legend('Data Points', 'Centroids', 'Location', 'best');
+% 
+%          fprintf('\n I plooped \n')  
+%%
