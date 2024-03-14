@@ -14,4 +14,6 @@ function doubled_array = DoubleTheCentroids(input_array, err)
         doubled_array(2*i - 1, :) = modified_row_1;
         doubled_array(2*i, :) = modified_row_2;
     end
+
+
 end

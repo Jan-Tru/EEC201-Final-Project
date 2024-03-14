@@ -1,125 +1,163 @@
+function [codebook] = LBG(input_matrix, err)
+    %clc;
 
-function [codebook] = LBG(input_matrix,k)
-% What did they call President LBJ after January 22, 1973?
-% Lyndon B. Gone-son 
-% LBG.m
-% The Luzo C Gray Algothriym is pretty straight foward after watching some indian
-% tutorials online
+    % idx_all = cell(num_runs, 1);
+    % obj_values = zeros(num_runs, 1);
+    % 
+    % opts = statset('Display', 'off');
+    % for i = 1:num_runs
+    %     [idx, C, sumd, ~] = kmeans(input_matrix, k, 'Start', 'plus', 'Options', opts);
+    %     idx_all{i} = idx;
+    %     obj_values(i) = sum(sumd);
+    % end
+    % 
+    % % Select the clustering result with the best overall performance
+    % [~, best_run] = min(obj_values);
+    % idx = idx_all{best_run};
 
-% Goal: I want this to be a function.
-% it will take in a MelCATrain_X array
-% it will produce a codebook for this array
-% Input: MelCATrain_X
-% Remember that this function takes in a MelCA and makes a codebook for it
-% C is the cluster assignment
+    % input_matrix = MelCA_Train8;
+    % err = 0.01;
 
-%input_matrix = Input_Array;
-%k = 10;
+    C = mean(input_matrix,2); % Initialize centroids with the mean of all data points
 
-clc;
-num_runs = 100;
+    max_iterations = 500;       % Define the maximum number of iterations
+    epsilon = 0.01;           % Define the convergence threshold
 
-% matrix init
-idx_all = cell(num_runs, 1);
-obj_values = zeros(num_runs, 1);
+    % Initialize distortion
+    D_old = Inf;
 
-opts = statset('Display', 'off');
+    % Iterate until convergence or maximum number of iterations
+    for iter = 1:max_iterations
+        % Compute distortion
+        D = 0;
+        for i = 1:size(input_matrix, 1)
+            % Find the closest centroid to each data point
+           
+            distances = sum((input_matrix(i, :) - C).^2, 2);
+            [~, idx] = min(distances);
+            % Add the squared distance to the distortion
+            D = D + sum((input_matrix(i, :) - C(idx, :)).^2);
+        end
 
-for i = 1:num_runs
-    [idx, C, sumd, D] = kmeans(input_matrix, k, 'Start', 'plus', 'Options', opts);
-    idx_all{i} = idx;
-    obj_values(i) = sum(sumd);
-end
+        % Check for convergence
+        %format long
+        %converg = abs(D_old - D) / D 
 
-% Select the clustering result with the best overall performance
-[~, best_run] = min(obj_values);
-idx = idx_all{best_run};
-% fprintf('%d \n',idx )
-% fprintf('best_run = %d\n',best_run')
+        if abs(D_old - D) / D < epsilon
+            fprintf('\n Converged!!! \n');
+            break;
+        end
 
-C_copy = C;
+        % Update distortion for next iteration
+        D_old = D;
 
-% I have my seedling centroid.... You know I had to double it
-size(C)
-err = 0.001;
-C1 = DoubleTheCentroids(C, err);
-size(C1)
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
-num_iterations = 500; % Define the maximum number of iterations
-
-% Initialize the loop variables
-
-
-% Initialize the matrix with zeros
-C_old = zeros(size(C1));
-
-% Define the tolerance for convergence
-tolerance = 0.1;
-fprintf('Anudda one')
-% Initialize a structure to store centroid variables
-centroid_struct = struct();
-
-% Iterate until convergence or maximum number of iterations
-while true
-
-    % Create a copy of the current centroids
-    Cnew = C;
-    fprintf('\n Anudda one \n')
-    % Update centroids for each iteration
-    for i = 1:num_iterations
-        % Double the centroids and store them in the old centroid positions
-        C_new = DoubleTheCentroids(C1, err);
-         fprintf('\n Hi1 \n')   
-        % Store the updated centroids in the centroid structure
-       % centroid_struct.(['C' num2str(i)]) = C_new;
-         fprintf('\n Hi2 \n')   
+        % Update centroids for next iteration
+        C = DoubleTheCentroids(C, err);
     end
 
-    % Update the centroids from the previous iteration
-    C_old = C_new;
-
-    norm(C_old - C_new)
-         fprintf('\n Hi3 \n')   
-    % Check for convergence
-    if norm(C_old - C_new) < tolerance
-        fprintf('\n JACKPOT!!! \n')
-       break; % Break the loop if convergence criterion is met
-
-    end
-
-
-    
-end
- 
-codebook = C_new;
-
-
-
-
-
-
-
-
-
-
-
+    codebook = C;
 end
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% This block plots the clusters and centeroids
 
-% % Example data matrix
+% 
+% %function [codebook] = LBG(input_matrix,k, err, num_runs)
+% % What did they call President LBJ after January 22, 1973?
+% % Lyndon B. Gone-son 
+% % LBG.m
+% % The Luzo C Gray Algothriym is pretty straight foward after watching some indian
+% % tutorials online
+% 
+% % Goal: I want this to be a function.
+% % it will take in a MelCATrain_X array
+% % it will produce a codebook for this array
+% % Input: MelCATrain_X
+% % Remember that this function takes in a MelCA and makes a codebook for it
+% % C is the cluster assignment
+% clc;
+% 
+%  input_matrix = MelCA_Train6;
+%  k = 19;
+%  err = 0.00000001;
+%  num_runs = 1;
+% 
+% idx_all = cell(num_runs, 1);
+% obj_values = zeros(num_runs, 1);
+% 
+% opts = statset('Display', 'off');
+% for i = 1:num_runs
+%     [idx, C, sumd, D] = kmeans(input_matrix, k, 'Start', 'plus', 'Options', opts);
+%     idx_all{i} = idx;
+%     obj_values(i) = sum(sumd);
+% end
+% 
+% % Select the clustering result with the best overall performance
+% [~, best_run] = min(obj_values);
+% idx = idx_all{best_run};
+% % fprintf('%d \n',idx )
+% % fprintf('best_run = %d\n',best_run')
+% 
+% C_store = C;
+% 
+% % I have my seedling centroid.... and You know I had to double it
+% %size(C)
+% %err = 0.001;
+% %C1 = DoubleTheCentroids(C, err);
+% %size(C1);
+% 
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 
+% 
+% max_iterations = 500;               % Define the maximum number of iterations
+% tolerance = 0.01;               % Define the tolerance for convergence
+% fprintf('Anudda one')
+% 
+% % Initialize distortion
+% D_old = Inf; % Set initial distortion to infinity
+% 
+% % Iterate until convergence or maximum number of iterations
+% for iter = 1:max_iterations
+% 
+%     % Compute distortion (squared error distortion)
+%     D = 0; % Initialize distortion for this iteration
+%     for i = 1:size(input_matrix, 1)
+%         % Find the closest centroid to each data point
+%         distances = sum((input_matrix(i, :) - C).^2, 2);
+%         [dist, idx] = min(distances);
+%         % Add the squared distance to the distortion
+%         D = D + sum((input_matrix(i, :) - C(idx, :)).^2);
+% 
+%     end
+% 
+% 
+% 
+%     % Check for convergence
+%     if (D_old - D) / D < epsilon
+%         fprintf('\n Converged!!! \n')
+%         break;
+%     end
+% 
+%     % Update distortion for next iteration
+%     D_old = D;
+% 
+%     % Update centroids for next iteration
+%     C = DoubleTheCentroids(C, err);
+% end
+% 
+% 
+% codebook = C;
+% 
+% %end
+% 
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% %% This block plots the clusters and centeroids
+% 
+% 
 % X = input_matrix;
+% centroids = C;
 % 
 % % Perform PCA to reduce dimensionality to 3 dimensions
 % coeff = pca(X);
 % X_pca = X * coeff(:, 1:3);
-% 
-% % Example centroid array
-% centroids = C_new;
 % 
 % % Plot the reduced-dimensional data and centroids in 3D
 % scatter3(X_pca(:, 1), X_pca(:, 2), X_pca(:, 3), 50, 'filled');
@@ -132,6 +170,5 @@ end
 % zlabel('Principal Component 3');
 % title('PCA Visualization of High-Dimensional Data with Centroids (3D)');
 % legend('Data Points', 'Centroids', 'Location', 'best');
-% 
 %          fprintf('\n I plooped \n')  
-%%
+% %%
