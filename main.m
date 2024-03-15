@@ -1,5 +1,5 @@
 %% Testing section for all the Methods of WavFileObj
-clc; clear all; close all;
+clc; clear; close all;
 
 numTestFiles = 8;
 numTrainFiles = 8;
