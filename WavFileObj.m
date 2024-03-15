@@ -24,7 +24,7 @@ classdef WavFileObj
            MelWrapArray;
            MelCepstrumArray;
            Codebook;
-           Error = 0.3;
+           Error = 0.3; % changeable LBG error; 0.3 is best so far
            ResampleFactor = 1; % samplerate = samplerate/resamplefactor
     end
 
