@@ -15,13 +15,16 @@ classdef WavFileObj
            Data
            SampleRate
            FrameArray
-           FrameMaxThreshold = 0.009 % Define default threshold for the max amplitude of a Frame in FrameArray, Frames with a lesser max amplitude are killed
-           FFTLength = 256*2; % Define the FFT Length here for all objects
+           FrameMaxThreshold = 0.05 % Define default threshold for the max amplitude of a Frame in FrameArray, Frames with a lesser max amplitude are killed
+           WindowedFrameArray;
+           FFTLength = 1024*2; % Define the FFT Length here for all objects
            FFTArray
            MelPointAmount = 20;
            MelWrapArray;
            MelCepstrumArray;
            Codebook;
+           Error = 0.3;
+           ResampleFactor = 1; % samplerate = samplerate/resamplefactor
     end
 
     methods
@@ -32,6 +35,10 @@ classdef WavFileObj
                 % save the basic object details
                 obj.FilePath = file_path;
                 [obj.Data, obj.SampleRate] = audioread(file_path);
+                
+                % resample the data
+                obj.SampleRate = floor(obj.SampleRate/obj.ResampleFactor);
+                obj.Data = resample(obj.Data,1,obj.ResampleFactor);
 
                 % create the frames
                 obj.FrameArray = FrameSplitter(obj.Data,obj.SampleRate);
@@ -42,20 +49,22 @@ classdef WavFileObj
                 % Extract frames that meet the condition
                 obj.FrameArray = obj.FrameArray(:, idx);
 
+                % Apply the the Hamming window
+                obj.WindowedFrameArray = HamWindowMult(obj.FrameArray);
+
                 % take the magnitude of the fft of each column and save to
                 % FFTArray
-                obj.FFTArray = abs(fft(obj.FrameArray,obj.FFTLength));
+                obj.FFTArray = abs(fft(obj.WindowedFrameArray,obj.FFTLength));
 
                 obj.MelWrapArray = MelFrequencyWrap( ...
                     obj.MelPointAmount, ...
                     obj.FFTArray, ...
-                    obj.FFTLength, ...
                     obj.SampleRate ...
                     );
 
                 obj.MelCepstrumArray = MelCepstrum(obj.MelWrapArray);
 
-                obj.Codebook = GenerateCodebook(obj.MelCepstrumArray);
+                obj.Codebook = GenerateCodebook(obj.MelCepstrumArray,obj.Error);
             end
         end
         

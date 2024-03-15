@@ -9,14 +9,14 @@
 % MFCC = train_objs{1}.MelCepstrumArray;
 % 
 
-function centroids = GenerateCodebook(MFCC) 
+function centroids = GenerateCodebook(MFCC,error) 
 
 D0 = 0;
 Dk = 9999;
 k = 1;
 splitted = [];
 distanceToCentroid = [];
-error = 0.50;
+%error = 0.50;
 
     % Initialize centroid by starting at the average of all points
     centroids = mean(MFCC,2);

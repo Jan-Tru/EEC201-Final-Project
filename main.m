@@ -1,11 +1,9 @@
 %% Testing section for all the Methods of WavFileObj
-clc;
+clc; clear all; close all;
 
 numTestFiles = 8;
 numTrainFiles = 8;
-numFiles = 8;
-epsilon = 0.01;
-
+numFiles = 19;
 
 train_objs = LoadMassFiles("train",numTestFiles);
 close all;
@@ -13,9 +11,12 @@ close all;
 test_objs = LoadMassFiles("test",numTrainFiles);
 close all;
 
-% zero_train = LoadMassFiles("Zero_train",numFiles);
-% zero_test = LoadMassFiles("Zero_test",numFiles);
-% 
+zero_train = LoadMassFiles("Zero_train",numFiles);
+close all;
+
+zero_test = LoadMassFiles("Zero_test",numFiles);
+close all;
+
 % twelve_train = LoadMassFiles("Zero_train",numFiles);
 % twelve_test = LoadMassFiles("Zero_test",numFiles);
 
@@ -24,17 +25,17 @@ close all;
 Cookbook = [];
 
 % Concatenate all the codebooks
-for i = 1:numTrainFiles
+for i = 1:numFiles
     % add an indicator number to the top of the codebook
-    numCodebookVectors = size(train_objs{i}.Codebook,2);
-    tempCodebook = [ones(1,numCodebookVectors)*i ; train_objs{i}.Codebook];
+    numCodebookVectors = size(zero_train{i}.Codebook,2);
+    tempCodebook = [ones(1,numCodebookVectors)*i ; zero_train{i}.Codebook];
 
     Cookbook = [Cookbook, tempCodebook];
 end
 
 counter = 0;
-for i = 1:numTestFiles
-    test1 = test_objs{i}.Codebook;
+for i = 1:numFiles
+    test1 = zero_test{i}.Codebook;
 
     % Cookbook excluding the first row which is the indicator for which set it
     % came from 
@@ -51,4 +52,4 @@ for i = 1:numTestFiles
     end
 end
 
-fprintf('Congradulations! \nPercent Correct: %f%%\nNumber Correct: %i\n',100*counter/numTestFiles,counter)
+fprintf('Congratulations! \nPercent Correct: %f%%\nNumber Correct: %i\n',100*counter/numFiles,counter)
