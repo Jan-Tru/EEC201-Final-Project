@@ -32,7 +32,6 @@ for i = 1:numTrainFiles
     Cookbook = [Cookbook, tempCodebook];
 end
 
-counter = 0;
 for i = 1:numTestFiles
     test1 = test_objs{i}.Codebook;
 
@@ -43,12 +42,6 @@ for i = 1:numTestFiles
     
     % Do the comparison
     Cookbook(1,ind);
-    mo = mode(Cookbook(1,ind));
-    avg = mean(Cookbook(1,ind));
-    fprintf('test: %i ; mode: %i\n',i,mo);
-    if mo == i
-        counter = counter + 1;
-    end
+    mode(Cookbook(1,ind))
+    mean(Cookbook(1,))
 end
-
-fprintf('Congradulations! \nPercent Correct: %f%%\nNumber Correct: %i\n',100*counter/numTestFiles,counter)

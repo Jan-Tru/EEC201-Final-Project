@@ -1,5 +1,6 @@
 % IndexMinArray.m create an array that shows 1 if the element is the mimum
-% of its row
+% of its row 
+% outputs a logical array
 
 function minIndexes = IndexMinArray(distanceArray)
     % Find the minimum value in each row
@@ -9,5 +10,5 @@ function minIndexes = IndexMinArray(distanceArray)
     logical_array = distanceArray == min_values;
     
     % Convert the logical array to 1s and 0s
-    minIndexes = double(logical_array);
+    minIndexes = logical(logical_array);
 end

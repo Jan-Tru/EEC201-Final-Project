@@ -1,61 +1,86 @@
 % GenerateCodebook.m a function file that allows you to generate a codebook
 % of centroids based on an inputed training MelCepArray
-numTrainFiles = 1;
-train_objs = LoadMassFiles("train",numTrainFiles);
 
-% Step 0, load in the MFCC and define error
-    MFCC1 = train_objs{1}.MelCepstrumArray;
-    error = 0.01;
+% % Testing Ground
+% numTrainFiles = 1;
+% train_objs = LoadMassFiles("train",numTrainFiles);
+% 
+% % load in the MFCC and define error
+% MFCC = train_objs{1}.MelCepstrumArray;
+% 
 
-% Step 1, average all vectors, should leave 19x1
-    centroid1 = mean(MFCC1,2);
+function centroids = GenerateCodebook(MFCC) 
 
-% Step 2, split the centroid by multiplying by error plus the average along
-    % the diagonal
-    centroid2 = [centroid1.*(1+error) centroid1.*(1-error)];
+D0 = 0;
+Dk = 9999;
+k = 1;
+splitted = [];
+distanceToCentroid = [];
+error = 0.50;
+
+    % Initialize centroid by starting at the average of all points
+    centroids = mean(MFCC,2);
     
-    % Then for each vector in centroid2 we need to move them to the average
-    % of the closest vectors in MFCC1 to each vector
+    % set the condition for convergence
+    % and start loop for calculating centroids
+    while abs(Dk-D0)/Dk > error
     
-    distanceToCentroid21 = Distance2MelCeps(MFCC1,centroid2(:,1));
-    distanceToCentroid22 = Distance2MelCeps(MFCC1,centroid2(:,2));
-    indexFor1 = distanceToCentroid21 > distanceToCentroid22;
-    indexFor2 = ~indexFor1;
+        % Step 0: Set Dk to the previous iteration, D0
+        D0 = Dk;
     
-    centroid2 = [mean(MFCC1(:,indexFor1),2), mean(MFCC1(:,indexFor2),2)];
+        % Step 1: Split the centroids using the following loop
+        for i = 1:size(centroids,2)
+            splitted = [splitted, centroids(:,i).*(1+error), centroids(:,i).*(1-error)];
+        end
     
-    % % Test plot, verrified working
-    % scatter(MFCC1(1,:),MFCC1(2,:));
-    % hold on;
-    % scatter(centroid2(1,:),centroid2(2,:));
-    % hold off;
-
-%Step 3, split and average again
-    len = length(MFCC1);
-
-    alt = generate_alternating_array(len);
-
-    centroid3 = [];
-    distanceToCentroid3 = [];
-
-    % split the centroids
-    for i = 1:size(centroid2,2)
-        centroid3 = [centroid3, centroid2(:,i).*(alt).*(1+error), centroid2(:,i).*(alt).*(1-error)];
+        % Step 2: calculate the distances for all the training points to splits
+        for i = 1:size(splitted,2)
+            distanceToCentroid = [distanceToCentroid, Distance2MelCeps(MFCC,splitted(:,i))'];
+        end
+    
+        % Step 3: Calculate the minimum indexes corresponding to the
+        % closest distances from each split to each frame.
+        % calculate the indexes of the MFCC frames closest to each split
+        % if an MFFC is closest to a split it is saved as a logical 1
+        % Note that our whole column scheme is kinda transposed
+        minIndexes = IndexMinArray(distanceToCentroid);
+    
+        % Step 4: Gravity, move the splits to the average of the closest
+        % frames to those centroids based on the indexing array
+        % You need to reset centroids here so it can update with the new
+        % means given by distance and split vectors
+        centroids = [];
+        for i = 1:size(minIndexes,2)
+            centroids = [centroids, mean(MFCC(:,minIndexes(:,i)),2)];
+        end
+        % unNAN and unZERO the centroids vectors
+        centroids(isnan(centroids)) = 0;
+        zero_columns = all(centroids == 0, 1);
+        centroids = centroids(:, ~zero_columns);
+    
+        % Step 5: Update Dk
+        Dk = norm(distanceToCentroid)/size(centroids,1);
+    
+        % Ps: counter
+        k = k+1;
+    
+        % if  abs(Dk-D0)/Dk < error
+        %     disp("HI, I CONVERGED")
+        % end
+        % disp(abs(Dk-D0)/Dk)
+    
+        % figure(4)
+        % x = 6;
+        % y = 19;
+        % scatter(MFCC(x,:),MFCC(y,:),150);
+        % hold on;
+        % scatter(centroids(x,:),centroids(y,:),50,"filled");
+        % hold off;
+        % pause(0.05)
+    
+        if k > 4 && Dk > D0
+            % disp("I broke free")
+            break;
+        end
     end
-    
-    % calculate the distances for all the training points to splits
-    for i = 1:size(centroid3,2)
-        distanceToCentroid3 = [distanceToCentroid3, Distance2MelCeps(MFCC1,centroid3(:,i))'];
-    end
-  
-    distanceToCentroid3;
-
-    minIndexes = IndexMinArray(distanceToCentroid3);
-
-    % Test plot, verrified working
-    scatter(MFCC1(1,:),MFCC1(2,:));
-    hold on;
-    scatter(centroid3(1,:),centroid3(2,:));
-    hold off;
-
-
+end

@@ -55,7 +55,7 @@ classdef WavFileObj
 
                 obj.MelCepstrumArray = MelCepstrum(obj.MelWrapArray);
 
-                obj.Codebook = GenerateCodebook(obj.MelCepstrumArray);
+                obj.Code
             end
         end
         
