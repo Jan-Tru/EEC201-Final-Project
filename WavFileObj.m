@@ -20,7 +20,7 @@ classdef WavFileObj
            WindowedFrameArray;
            FFTLength = 1024*2; % Define the FFT Length here for all objects
            FFTArray
-           MelPointAmount = 20;
+           MelPointAmount = 20; % the amount of triangular bins, the code doesn't like you touching this!
            MelWrapArray;
            MelCepstrumArray;
            Codebook;

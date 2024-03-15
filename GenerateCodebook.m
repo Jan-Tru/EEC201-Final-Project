@@ -69,7 +69,7 @@ distanceToCentroid = [];
         % end
         % disp(abs(Dk-D0)/Dk)
     
-        % figure(4)
+        % figure(1)
         % x = 6;
         % y = 19;
         % scatter(MFCC(x,:),MFCC(y,:),150);
