@@ -14,6 +14,7 @@ classdef WavFileObj
            ID
            Data
            SampleRate
+           FrameLength = 15 % define the time domain length of each frame in milliseconds
            FrameArray
            FrameMaxThreshold = 0.05 % Define default threshold for the max amplitude of a Frame in FrameArray, Frames with a lesser max amplitude are killed
            WindowedFrameArray;
@@ -41,7 +42,7 @@ classdef WavFileObj
                 obj.Data = resample(obj.Data,1,obj.ResampleFactor);
 
                 % create the frames
-                obj.FrameArray = FrameSplitter(obj.Data,obj.SampleRate);
+                obj.FrameArray = FrameSplitter(obj.Data,obj.SampleRate,obj.FrameLength);
                 
                 % Find frames greater than 0.009 max amplitude
                 idx = max(obj.FrameArray) > obj.FrameMaxThreshold;

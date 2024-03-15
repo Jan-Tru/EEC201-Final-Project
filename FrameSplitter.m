@@ -9,9 +9,9 @@
     % data = zero_train1.Data;
     % sample_rate = zero_train1.SampleRate;
 
-function FrameArray = FrameSplitter(data,sample_rate)
+    function FrameArray = FrameSplitter(data,sample_rate,frame_length)
     % define the variable for 30ms/s
-    THIRTY_MS = 30/1000;
+    THIRTY_MS = frame_length/1000;
     
     % determine the amount of samples it takes to cover 30ms
     samples_per_frame = floor(THIRTY_MS*sample_rate);
