@@ -5,8 +5,8 @@ numFiles = 19;
 
 zero_train = LoadMassFiles("Zero_train",numFiles);
 zero_test = LoadMassFiles("Zero_test",numFiles);
-twelve_train = LoadMassFiles("Zero_train",numFiles);
-twelve_test = LoadMassFiles("Zero_test",numFiles);
+twelve_train = LoadMassFiles("Twelve_train",numFiles);
+twelve_test = LoadMassFiles("Twelve_test",numFiles);
 close all;
 
 
@@ -18,6 +18,7 @@ for i = 1:numFiles
     % add an indicator number to the top of the codebook
     numCodebookVectors = size(zero_train{i}.Codebook,2);
     tempCodebook = [ones(1,numCodebookVectors)*i ; zero_train{i}.Codebook];
+    numCodebookVectors = size(twelve_train{i}.Codebook,2); % update length of index array that goes ontop of the codebook to twelves
     tempCodebookTwo = [ones(1,numCodebookVectors)*i ; twelve_train{i}.Codebook];
     Cookbook = [Cookbook, tempCodebook, tempCodebookTwo];
 end

@@ -69,14 +69,14 @@ distanceToCentroid = [];
         % end
         % disp(abs(Dk-D0)/Dk)
     
-        % figure(1)
-        % x = 6;
-        % y = 19;
-        % scatter(MFCC(x,:),MFCC(y,:),150);
-        % hold on;
-        % scatter(centroids(x,:),centroids(y,:),50,"filled");
-        % hold off;
-        % pause(0.05)
+%         figure(1)
+%         x = 6;
+%         y = 19;
+%         scatter(MFCC(x,:),MFCC(y,:),150);
+%         hold on;
+%         scatter(centroids(x,:),centroids(y,:),50,"filled");
+%         hold off;
+%         pause(0.2)
     
         if k > 4 && Dk > D0
             % disp("I broke free")
