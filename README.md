@@ -4,6 +4,9 @@ This is Team Twice the Pride, Double the Fall
 
 The final project for EEC201. Winter 2024
 
+# Project Report (rough draft) : https://docs.google.com/document/d/1YYgFYRWHvvUntsPvv4I-SExkwhzcAU1Lf8jWb4l_MeE/edit?usp=sharing
+
+
 3/4/24 - See main.m file for example uses commented out for the WavFileObj the project surrounds.
 
 
