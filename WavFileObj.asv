@@ -10,21 +10,21 @@
 % For organizational purposes of course
 classdef WavFileObj
     properties
-           ID
            FilePath
+           ID
            Data
            SampleRate
            FrameLength = 15 % define the time domain length of each frame in milliseconds
            FrameArray
-           FrameMaxThreshold = 2 % Define default threshold for the max amplitude of a Frame in FrameArray, Frames with a lesser max amplitude are killed
+           FrameMaxThreshold = 3. % Define default threshold for the max amplitude of a Frame in FrameArray, Frames with a lesser max amplitude are killed
            WindowedFrameArray;
-           FFTLength = 512*2; % Define the FFT Length here for all objects
+           FFTLength = 1024*2; % Define the FFT Length here for all objects
            FFTArray
            MelPointAmount = 20; % the amount of triangular bins, the code doesn't like you touching this!
            MelWrapArray;
            MelCepstrumArray;
            Codebook;
-           Error = 0.35; % changeable LBG error; 0.3 is best so far
+           Error = 0.3; % changeable LBG error; 0.3 is best so far
            ResampleFactor = 1; % samplerate = samplerate/resamplefactor
     end
 

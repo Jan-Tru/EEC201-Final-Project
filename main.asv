@@ -5,8 +5,8 @@ numFiles = 19;
 
 zero_train = LoadMassFiles("Zero_train",numFiles);
 zero_test = LoadMassFiles("Zero_test",numFiles);
-twelve_train = LoadMassFiles("Twelve_train",numFiles);
-twelve_test = LoadMassFiles("Twelve_test",numFiles);
+twelve_train = LoadMassFiles("Zero_train",numFiles);
+twelve_test = LoadMassFiles("Zero_test",numFiles);
 close all;
 
 
@@ -18,7 +18,6 @@ for i = 1:numFiles
     % add an indicator number to the top of the codebook
     numCodebookVectors = size(zero_train{i}.Codebook,2);
     tempCodebook = [ones(1,numCodebookVectors)*i ; zero_train{i}.Codebook];
-    numCodebookVectors = size(twelve_train{i}.Codebook,2); % update length of index array that goes ontop of the codebook to twelves
     tempCodebookTwo = [ones(1,numCodebookVectors)*i ; twelve_train{i}.Codebook];
     Cookbook = [Cookbook, tempCodebook, tempCodebookTwo];
 end
@@ -86,7 +85,7 @@ test_objs = LoadMassFiles("test",numTrainFiles);
 for i = 1:numTestFiles
     % add an indicator number to the top of the codebook
     numCodebookVectors = size(train_objs{i}.Codebook,2);
-    tempCodebook = [ones(1,numCodebookVectors)*i ; train_objs{i}.Codebook];
+    tempCodebook = [ones(1,numCodebookVectors)*i ; zero_train{i}.Codebook];
     Cookbook = [Cookbook, tempCodebook];
 end
 % Cookbook excluding the first row which is the indicator for which set it
@@ -96,7 +95,7 @@ CookbookWithNoPageNumbers = Cookbook(2:end,:);
 
 % Test and train file test with given samples
 counter = 0;
-for i = 1:numTestFiles
+for i = 1:numFiles
     test1 = test_objs{i}.Codebook;
 
     % Compute the distance between the selected test vector and
@@ -112,4 +111,4 @@ for i = 1:numTestFiles
         counter = counter + 1;
     end
 end
-fprintf('Congratulations on testing The given samples! \nPercent Correct: %f%%\nNumber Correct: %i\n\n',100*counter/numTestFiles,counter)
+fprintf('Congratulations on testing Twelve! \nPercent Correct: %f%%\nNumber Correct: %i\n\n',100*counter/numFiles,counter)
