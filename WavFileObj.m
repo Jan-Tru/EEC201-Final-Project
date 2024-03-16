@@ -26,12 +26,14 @@ classdef WavFileObj
            Codebook;
            Error = 0.35; % changeable LBG error; 0.3 is best so far
            ResampleFactor = 1; % samplerate = samplerate/resamplefactor
+           CentroidLoopNumber = 5; % there are 2^(CentroidLoopNumber + 1) Centroids created
     end
 
     methods
 
         % Constructor
         function obj = WavFileObj(file_path)
+            % if there is an arguent to the constructor
             if nargin > 0
                 % save the basic object details
                 obj.FilePath = file_path;
@@ -43,6 +45,8 @@ classdef WavFileObj
 
                 % add energy normalization to the data and remove its DC
                 % values
+                % adds a negligible value so that the log(0) doesnt throw
+                % zeros so there's a tiny bit of offset
                 obj.Data = EnergyNormalizer(obj.Data);
 
                 % create the frames
@@ -69,7 +73,7 @@ classdef WavFileObj
 
                 obj.MelCepstrumArray = MelCepstrum(obj.MelWrapArray);
 
-                obj.Codebook = GenerateCodebook(obj.MelCepstrumArray,obj.Error);
+                obj.Codebook = GenerateCodebookLoops(obj.MelCepstrumArray,obj.Error,obj.CentroidLoopNumber);
             end
         end
         
