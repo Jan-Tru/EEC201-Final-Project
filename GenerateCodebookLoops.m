@@ -56,7 +56,7 @@ distanceToCentroid = [];
         centroids(isnan(centroids)) = 0;
         zero_columns = all(centroids == 0, 1);
         centroids = centroids(:, ~zero_columns);
-    
+%     
 %         figure(1)
 %         x = 6;
 %         y = 19;
@@ -64,7 +64,7 @@ distanceToCentroid = [];
 %         hold on;
 %         scatter(centroids(x,:),centroids(y,:),50,"filled");
 %         hold off;
-%         pause(2)
+%         pause(1)
     
     end
 end

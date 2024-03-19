@@ -65,6 +65,10 @@ classdef WavFileObj
                 % FFTArray
                 obj.FFTArray = abs(fft(obj.WindowedFrameArray,obj.FFTLength));
 
+                % Apply a notch filter for robustness testing, comment out
+                % otherwise:
+                %obj.FFTArray = NotchFilter(obj.FFTArray);
+
                 obj.MelWrapArray = MelFrequencyWrap( ...
                     obj.MelPointAmount, ...
                     obj.FFTArray, ...
@@ -110,6 +114,30 @@ classdef WavFileObj
 
         function PlotSpectrogram(obj)
             PlotSpectrogram(obj.Data,obj.SampleRate,obj.FFTLength)
+        end
+
+        % Method to print the periodogram of the colored waveform using STFT in 3D
+        function PlotPeriodogram(obj)
+            % Calculate the Short-Time Fourier Transform (STFT)
+            [S,F,T] = stft(obj.Data,FFTLength=obj.FFTLength,OverlapLength=floor(128/3));
+        
+            sample_rate = obj.SampleRate;
+
+            % Create the frequency axis ranging from -sample_rate/2 to sample_rate/2
+            frequency_axis = linspace(-sample_rate/2, sample_rate/2, size(S,1));
+            
+            % Plot the STFT in 3D
+            figure;
+            surf(T, frequency_axis, abs(S), 'EdgeColor', 'none');
+            axis tight;
+            colormap(jet);
+            view(3); % Change the view to 3D
+            xlabel('Time (ms)');
+            ylabel('Frequency (Hz)');
+            zlabel('Power Magnitude (Absolute)');
+            title('STFT Periodogram');
+            % Set the frequency axis ticks every 1000 Hz
+            yticks(-13000/2:1000:13000/2);
         end
     end
 end
