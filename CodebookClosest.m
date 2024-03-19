@@ -15,7 +15,7 @@ function [distanceVector, indexVector] = CodebookClosest(TestArray, TrainArray)
     for l = 1:size(TestArray,2)
 
         % initialize distance to a high number so the value can drop
-        distanceCell = 9999999;
+        distanceCell = 999999999999;
  
         % for every column in MelCep2
         for k = 1:size(TrainArray,2)

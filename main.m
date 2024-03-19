@@ -76,11 +76,11 @@ fprintf('Congratulations on testing Twelve! \nPercent Correct: %f%%\nNumber Corr
 
 % define the number of files
 numTestFiles = 8;
-numTrainFiles = 8;
+numTrainFiles = 11;
 
 % load in the samples
-train_objs = LoadMassFiles("train",numTestFiles);
-test_objs = LoadMassFiles("test",numTrainFiles);
+train_objs = LoadMassFiles("train",numTrainFiles);
+test_objs = LoadMassFiles("test",numTestFiles);
 
 % Concatenate all the codebooks
 for i = 1:numTestFiles
@@ -112,4 +112,49 @@ for i = 1:numTestFiles
         counter = counter + 1;
     end
 end
-fprintf('Congratulations on testing The given samples! \nPercent Correct: %f%%\nNumber Correct: %i\n\n',100*counter/numTestFiles,counter)
+fprintf('Congratulations on testing the given samples! \nPercent Correct: %f%%\nNumber Correct: %i\n\n',100*counter/numTestFiles,counter)
+
+
+%% Codebook with the provided test and train samples
+
+
+% define the number of files
+numTestFiles = 2;
+numTrainFiles = 2;
+
+% load in the samples
+train_objs = LoadMassFiles("DSP_Train",numTrainFiles);
+test_objs = LoadMassFiles("DSP_Test",numTestFiles);
+
+Cookbook = [];
+% Concatenate all the codebooks
+for i = 1:numTestFiles
+    % add an indicator number to the top of the codebook
+    numCodebookVectors = size(train_objs{i}.Codebook,2);
+    tempCodebook = [ones(1,numCodebookVectors)*i ; train_objs{i}.Codebook];
+    Cookbook = [Cookbook, tempCodebook];
+end
+% Cookbook excluding the first row which is the indicator for which set it
+% came from 
+CookbookWithNoPageNumbers = Cookbook(2:end,:);
+
+
+% Test and train file test with given samples
+counter = 0;
+for i = 1:numTestFiles
+    test1 = test_objs{i}.Codebook;
+
+    % Compute the distance between the selected test vector and
+    % the closest vector to it in the codebook using the CodebookClosest
+    % function
+    [dist, ind] = CodebookClosest(test1,CookbookWithNoPageNumbers);
+    
+    % Do the comparison
+    Cookbook(1,ind);
+    mo = mode(Cookbook(1,ind));
+    fprintf('test: %i ; mode: %i\n',i,mo); % just a little section to calc the percent correct
+    if mo == i
+        counter = counter + 1;
+    end
+end
+fprintf('Congratulations on testing the DSP samples! \nPercent Correct: %f%%\nNumber Correct: %i\n\n',100*counter/numTestFiles,counter)
